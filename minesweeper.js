@@ -6,15 +6,15 @@ const TILE_STATUSES = {
 	NUMBER: 'number',
 	MARKED: 'marked',
 };
-
+let boardData;
 export function createBoard(boardSize, numberOfMines) {
 	const minesPositions = getMinPositions(boardSize, numberOfMines);
 
-	const boardData = Array.from({ length: boardSize }, (_, i) =>
+	boardData = Array.from({ length: boardSize }, (_, i) =>
 		Array.from({ length: boardSize }, (_, j) => ({
 			x: i,
 			y: j,
-			status: 'number',
+			status: 'hidden',
 			number: 0,
 		}))
 	);
@@ -27,6 +27,20 @@ export function createBoard(boardSize, numberOfMines) {
 	});
 
 	return boardData;
+}
+
+export function markTile(tile, element) {
+	const status = boardData[tile.x][tile.y].status;
+	console.log(status);
+	if (status !== TILE_STATUSES.HIDDEN && status !== TILE_STATUSES.MARKED)
+		return;
+	if (status === TILE_STATUSES.MARKED) {
+		boardData[tile.x][tile.y].status = TILE_STATUSES.HIDDEN;
+		element.dataset.status = TILE_STATUSES.HIDDEN;
+	} else {
+		boardData[tile.x][tile.y].status = TILE_STATUSES.MARKED;
+		element.dataset.status = TILE_STATUSES.MARKED;
+	}
 }
 
 function getMinPositions(size, numberOfMines) {
