@@ -7,8 +7,11 @@ const NUMBER_OF_MINES = 10;
 
 const board = createBoard(BOARD_SIZE, NUMBER_OF_MINES);
 const boardElement = document.querySelector('.board');
+const mineLestText = document.querySelector('[data-mine-count]');
+
 renderBoard(BOARD_SIZE);
-console.log(board);
+mineLestText.innerText = NUMBER_OF_MINES;
+
 function renderBoard(size) {
 	boardElement.style.setProperty('--size', BOARD_SIZE);
 
