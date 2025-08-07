@@ -6,51 +6,61 @@ const TILE_STATUSES = {
 	NUMBER: 'number',
 	MARKED: 'marked',
 };
-let boardData;
+
 export function createBoard(boardSize, numberOfMines) {
-	const minesPositions = getMinPositions(boardSize, numberOfMines);
+	const boardData = [];
+	const minePositions = getMinePositions(boardSize, numberOfMines);
 
-	boardData = Array.from({ length: boardSize }, (_, i) =>
-		Array.from({ length: boardSize }, (_, j) => ({
-			x: i,
-			y: j,
-			status: 'hidden',
-			number: 0,
-		}))
-	);
+	for (let x = 0; x < boardSize; x++) {
+		const row = [];
+		for (let y = 0; y < boardSize; y++) {
+			const element = document.createElement('div');
+			element.dataset.status = TILE_STATUSES.HIDDEN;
 
-	minesPositions.forEach((mine) => {
-		const x = mine.x;
-		const y = mine.y;
-		boardData[x][y].status = 'mine';
-		boardData[x][y].number = -1;
-	});
+			const tile = {
+				element,
+				x,
+				y,
+				mine: minePositions.some(positionMatch.bind(null, { x, y })),
+				get status() {
+					return this.element.dataset.status;
+				},
+				set status(value) {
+					this.element.dataset.status = value;
+				},
+			};
+
+			row.push(tile);
+		}
+		boardData.push(row);
+	}
 
 	return boardData;
 }
 
-export function markTile(tile, element) {
-	const status = boardData[tile.x][tile.y].status;
-	console.log(status);
-	if (status !== TILE_STATUSES.HIDDEN && status !== TILE_STATUSES.MARKED)
+export function markTile(tile) {
+	if (
+		tile.status !== TILE_STATUSES.HIDDEN &&
+		tile.status !== TILE_STATUSES.MARKED
+	) {
 		return;
-	if (status === TILE_STATUSES.MARKED) {
-		boardData[tile.x][tile.y].status = TILE_STATUSES.HIDDEN;
-		element.dataset.status = TILE_STATUSES.HIDDEN;
+	}
+
+	if (tile.status === TILE_STATUSES.MARKED) {
+		tile.status = TILE_STATUSES.HIDDEN;
 	} else {
-		boardData[tile.x][tile.y].status = TILE_STATUSES.MARKED;
-		element.dataset.status = TILE_STATUSES.MARKED;
+		tile.status = TILE_STATUSES.MARKED;
 	}
 }
 
-function getMinPositions(size, numberOfMines) {
+function getMinePositions(size, numberOfMines) {
 	const positions = [];
 	while (positions.length < numberOfMines) {
 		const position = {
 			x: randomNumber(size),
 			y: randomNumber(size),
 		};
-		if (!positions.some((p) => positionsMatch(p, position))) {
+		if (!positions.some((p) => positionMatch(p, position))) {
 			positions.push(position);
 		}
 	}
@@ -58,7 +68,7 @@ function getMinPositions(size, numberOfMines) {
 	return positions;
 }
 
-function positionsMatch(a, b) {
+function positionMatch(a, b) {
 	return a.x === b.x && a.y === b.y;
 }
 
