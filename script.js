@@ -7,30 +7,23 @@ const NUMBER_OF_MINES = 10;
 
 const board = createBoard(BOARD_SIZE, NUMBER_OF_MINES);
 const boardElement = document.querySelector('.board');
-const mineLestText = document.querySelector('[data-mine-count]');
+const minesLeftText = document.querySelector('[data-mine-count]');
 
-boardElement.addEventListener('contextmenu', (e) => {
-	e.preventDefault();
-	if (!e.target.matches('div[data-status]')) return;
-	const tile = e.target;
-	const x = Number(tile.dataset.xLocation);
-	const y = Number(tile.dataset.yLocation);
-	markTile({ x, y }, e.target);
-});
+renderBoard();
+minesLeftText.innerText = NUMBER_OF_MINES;
 
-renderBoard(BOARD_SIZE);
-mineLestText.innerText = NUMBER_OF_MINES;
+function renderBoard() {
+	board.forEach((row) => {
+		row.forEach((tile) => {
+			boardElement.append(tile.element);
 
-function renderBoard(size) {
+			tile.element.addEventListener('contextmenu', (e) => {
+				e.preventDefault();
+				markTile(tile);
+				listMinesLeft();
+			});
+		});
+	});
 	boardElement.style.setProperty('--size', BOARD_SIZE);
-
-	for (let i = 0; i < size; i++) {
-		for (let j = 0; j < size; j++) {
-			const tile = document.createElement('div');
-			tile.dataset.status = 'hidden';
-			tile.dataset.xLocation = i;
-			tile.dataset.yLocation = j;
-			boardElement.appendChild(tile);
-		}
-	}
+	minesLeftText.textContent = NUMBER_OF_MINES;
 }
